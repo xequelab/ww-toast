@@ -1,72 +1,66 @@
 <template>
-  <Teleport to="body">
-    <Transition
-      :name="transitionName"
-      :duration="animationDurationMs"
-      @after-leave="onAfterLeave"
+  <div class="ww-toast-wrapper">
+    <div
+      v-if="isVisible || isEditing"
+      class="toast-container"
+      :class="[positionClass, animationClass, { 'is-visible': isVisible }]"
+      :style="containerStyle"
+      @mouseenter="handleMouseEnter"
+      @mouseleave="handleMouseLeave"
+      role="alert"
+      aria-live="polite"
     >
-      <div
-        v-show="isVisible"
-        class="toast-container"
-        :class="[positionClass, animationClass]"
-        :style="containerStyle"
-        @mouseenter="handleMouseEnter"
-        @mouseleave="handleMouseLeave"
-        role="alert"
-        aria-live="polite"
-      >
-        <div class="toast-content" :style="contentStyle">
-          <!-- Accent Border -->
-          <div class="toast-accent" :style="accentStyle"></div>
+      <div class="toast-content" :style="contentStyle">
+        <!-- Accent Border -->
+        <div class="toast-accent" :style="accentStyle"></div>
 
-          <!-- Icon -->
-          <div class="toast-icon" :style="iconContainerStyle">
-            <!-- Success Icon -->
-            <svg v-if="currentType === 'success'" viewBox="0 0 24 24" fill="none" :style="iconStyle">
-              <circle cx="12" cy="12" r="10" :fill="typeColor" fill-opacity="0.2"/>
-              <path d="M8 12l2.5 2.5L16 9" :stroke="typeColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+        <!-- Icon -->
+        <div class="toast-icon" :style="iconContainerStyle">
+          <!-- Success Icon -->
+          <svg v-if="currentType === 'success'" viewBox="0 0 24 24" fill="none" :style="iconStyle">
+            <circle cx="12" cy="12" r="10" :fill="typeColor" fill-opacity="0.2"/>
+            <path d="M8 12l2.5 2.5L16 9" :stroke="typeColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
 
-            <!-- Warning Icon -->
-            <svg v-else-if="currentType === 'warning'" viewBox="0 0 24 24" fill="none" :style="iconStyle">
-              <circle cx="12" cy="12" r="10" :fill="typeColor" fill-opacity="0.2"/>
-              <path d="M12 8v4m0 4h.01" :stroke="typeColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+          <!-- Warning Icon -->
+          <svg v-else-if="currentType === 'warning'" viewBox="0 0 24 24" fill="none" :style="iconStyle">
+            <circle cx="12" cy="12" r="10" :fill="typeColor" fill-opacity="0.2"/>
+            <path d="M12 8v4m0 4h.01" :stroke="typeColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
 
-            <!-- Error Icon -->
-            <svg v-else viewBox="0 0 24 24" fill="none" :style="iconStyle">
-              <circle cx="12" cy="12" r="10" :fill="typeColor" fill-opacity="0.2"/>
-              <path d="M15 9l-6 6m0-6l6 6" :stroke="typeColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-
-          <!-- Text Content -->
-          <div class="toast-text">
-            <div class="toast-title" :style="titleStyle">{{ currentTitle }}</div>
-            <div class="toast-message" :style="messageStyle">{{ currentMessage }}</div>
-          </div>
-
-          <!-- Close Button -->
-          <button
-            v-if="showCloseButton"
-            class="toast-close"
-            :style="closeButtonStyle"
-            @click="handleClose"
-            aria-label="Close notification"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
+          <!-- Error Icon -->
+          <svg v-else viewBox="0 0 24 24" fill="none" :style="iconStyle">
+            <circle cx="12" cy="12" r="10" :fill="typeColor" fill-opacity="0.2"/>
+            <path d="M15 9l-6 6m0-6l6 6" :stroke="typeColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
 
-        <!-- Progress Bar -->
-        <div v-if="showProgressBar && !isPaused" class="toast-progress" :style="progressContainerStyle">
-          <div class="toast-progress-bar" :style="progressBarStyle"></div>
+        <!-- Text Content -->
+        <div class="toast-text">
+          <div class="toast-title" :style="titleStyle">{{ currentTitle }}</div>
+          <div class="toast-message" :style="messageStyle">{{ currentMessage }}</div>
         </div>
+
+        <!-- Close Button -->
+        <button
+          v-if="showCloseButton"
+          class="toast-close"
+          :style="closeButtonStyle"
+          @click="handleClose"
+          aria-label="Close notification"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
-    </Transition>
-  </Teleport>
+
+      <!-- Progress Bar -->
+      <div v-if="showProgressBar && !isPaused" class="toast-progress" :style="progressContainerStyle">
+        <div class="toast-progress-bar" :style="progressBarStyle"></div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -95,7 +89,7 @@ export default {
     // === EDITOR STATE ===
     const isEditing = computed(() => {
       /* wwEditor:start */
-      return props.wwEditorState?.isEditing;
+      return props.wwEditorState && props.wwEditorState.isEditing;
       /* wwEditor:end */
       // eslint-disable-next-line no-unreachable
       return false;
@@ -113,21 +107,21 @@ export default {
       uid: props.uid,
       name: 'currentType',
       type: 'string',
-      defaultValue: computed(() => props.content?.toastType || 'success')
+      defaultValue: computed(() => (props.content && props.content.toastType) || 'success')
     });
 
     const { value: currentTitle, setValue: setCurrentTitle } = wwLib.wwVariable.useComponentVariable({
       uid: props.uid,
       name: 'currentTitle',
       type: 'string',
-      defaultValue: computed(() => props.content?.title || 'Notification')
+      defaultValue: computed(() => (props.content && props.content.title) || 'Notification')
     });
 
     const { value: currentMessage, setValue: setCurrentMessage } = wwLib.wwVariable.useComponentVariable({
       uid: props.uid,
       name: 'currentMessage',
       type: 'string',
-      defaultValue: computed(() => props.content?.message || '')
+      defaultValue: computed(() => (props.content && props.content.message) || '')
     });
 
     // === LOCAL STATE ===
@@ -139,25 +133,25 @@ export default {
     const startTime = ref(0);
 
     // === COMPUTED PROPERTIES ===
-    const duration = computed(() => props.content?.duration || 5000);
-    const showCloseButton = computed(() => props.content?.showCloseButton !== false);
-    const showProgressBar = computed(() => props.content?.showProgressBar !== false);
-    const pauseOnHover = computed(() => props.content?.pauseOnHover !== false);
-    const position = computed(() => props.content?.position || 'top-right');
-    const animationType = computed(() => props.content?.animationType || 'slide-fade');
-    const animationDurationMs = computed(() => props.content?.animationDuration || 300);
+    const duration = computed(() => (props.content && props.content.duration) || 5000);
+    const showCloseButton = computed(() => (props.content && props.content.showCloseButton) !== false);
+    const showProgressBar = computed(() => (props.content && props.content.showProgressBar) !== false);
+    const pauseOnHover = computed(() => (props.content && props.content.pauseOnHover) !== false);
+    const position = computed(() => (props.content && props.content.position) || 'top-right');
+    const animationType = computed(() => (props.content && props.content.animationType) || 'slide-fade');
+    const animationDurationMs = computed(() => (props.content && props.content.animationDuration) || 300);
 
     const typeColor = computed(() => {
-      const type = currentType.value || props.content?.toastType || 'success';
+      const type = currentType.value || (props.content && props.content.toastType) || 'success';
       switch (type) {
         case 'success':
-          return props.content?.successColor || '#22c55e';
+          return (props.content && props.content.successColor) || '#22c55e';
         case 'warning':
-          return props.content?.warningColor || '#eab308';
+          return (props.content && props.content.warningColor) || '#eab308';
         case 'error':
-          return props.content?.errorColor || '#ef4444';
+          return (props.content && props.content.errorColor) || '#ef4444';
         default:
-          return props.content?.successColor || '#22c55e';
+          return (props.content && props.content.successColor) || '#22c55e';
       }
     });
 
@@ -165,31 +159,15 @@ export default {
 
     const animationClass = computed(() => `animation-${animationType.value}`);
 
-    const transitionName = computed(() => {
-      const type = animationType.value;
-      const pos = position.value;
-
-      if (type === 'none') return '';
-      if (type === 'fade') return 'toast-fade';
-
-      // Determine slide direction based on position
-      if (pos.includes('right')) return 'toast-slide-right';
-      if (pos.includes('left')) return 'toast-slide-left';
-      if (pos.includes('top')) return 'toast-slide-top';
-      if (pos.includes('bottom')) return 'toast-slide-bottom';
-
-      return 'toast-fade';
-    });
-
     // === STYLES ===
     const containerStyle = computed(() => {
-      const offsetX = props.content?.offsetX || '20px';
-      const offsetY = props.content?.offsetY || '20px';
+      const offsetX = (props.content && props.content.offsetX) || '20px';
+      const offsetY = (props.content && props.content.offsetY) || '20px';
       const pos = position.value;
 
       const style = {
         '--animation-duration': `${animationDurationMs.value}ms`,
-        '--toast-width': props.content?.toastWidth || '360px',
+        '--toast-width': (props.content && props.content.toastWidth) || '360px',
         zIndex: 9999
       };
 
@@ -207,18 +185,18 @@ export default {
     });
 
     const contentStyle = computed(() => ({
-      backgroundColor: props.content?.backgroundColor || '#1a2332',
-      borderRadius: props.content?.borderRadius || '8px',
-      padding: props.content?.padding || '16px',
-      boxShadow: props.content?.boxShadow || '0 4px 12px rgba(0, 0, 0, 0.3)',
-      width: props.content?.toastWidth || '360px',
+      backgroundColor: (props.content && props.content.backgroundColor) || '#1a2332',
+      borderRadius: (props.content && props.content.borderRadius) || '8px',
+      padding: (props.content && props.content.padding) || '16px',
+      boxShadow: (props.content && props.content.boxShadow) || '0 4px 12px rgba(0, 0, 0, 0.3)',
+      width: (props.content && props.content.toastWidth) || '360px',
       maxWidth: '100%'
     }));
 
     const accentStyle = computed(() => ({
       backgroundColor: typeColor.value,
-      width: props.content?.borderWidth || '4px',
-      borderRadius: `${props.content?.borderRadius || '8px'} 0 0 ${props.content?.borderRadius || '8px'}`
+      width: (props.content && props.content.borderWidth) || '4px',
+      borderRadius: `${(props.content && props.content.borderRadius) || '8px'} 0 0 ${(props.content && props.content.borderRadius) || '8px'}`
     }));
 
     const iconContainerStyle = computed(() => ({
@@ -226,31 +204,31 @@ export default {
     }));
 
     const iconStyle = computed(() => ({
-      width: props.content?.iconSize || '24px',
-      height: props.content?.iconSize || '24px'
+      width: (props.content && props.content.iconSize) || '24px',
+      height: (props.content && props.content.iconSize) || '24px'
     }));
 
     const titleStyle = computed(() => ({
-      color: props.content?.titleColor || '#ffffff',
-      fontSize: props.content?.titleFontSize || '16px',
+      color: (props.content && props.content.titleColor) || '#ffffff',
+      fontSize: (props.content && props.content.titleFontSize) || '16px',
       fontWeight: '600',
       marginBottom: '4px'
     }));
 
     const messageStyle = computed(() => ({
-      color: props.content?.messageColor || '#a0aec0',
-      fontSize: props.content?.messageFontSize || '14px',
+      color: (props.content && props.content.messageColor) || '#a0aec0',
+      fontSize: (props.content && props.content.messageFontSize) || '14px',
       lineHeight: '1.4'
     }));
 
     const closeButtonStyle = computed(() => ({
-      color: props.content?.messageColor || '#a0aec0'
+      color: (props.content && props.content.messageColor) || '#a0aec0'
     }));
 
     const progressContainerStyle = computed(() => ({
-      height: props.content?.progressBarHeight || '3px',
+      height: (props.content && props.content.progressBarHeight) || '3px',
       backgroundColor: 'rgba(255, 255, 255, 0.1)',
-      borderRadius: `0 0 ${props.content?.borderRadius || '8px'} ${props.content?.borderRadius || '8px'}`,
+      borderRadius: `0 0 ${(props.content && props.content.borderRadius) || '8px'} ${(props.content && props.content.borderRadius) || '8px'}`,
       overflow: 'hidden',
       marginTop: '-1px'
     }));
@@ -316,9 +294,9 @@ export default {
       if (isEditing.value) return;
 
       // Reset to content values
-      setCurrentType(props.content?.toastType || 'success');
-      setCurrentTitle(props.content?.title || 'Notification');
-      setCurrentMessage(props.content?.message || '');
+      setCurrentType((props.content && props.content.toastType) || 'success');
+      setCurrentTitle((props.content && props.content.title) || 'Notification');
+      setCurrentMessage((props.content && props.content.message) || '');
 
       setIsVisible(true);
       isPaused.value = false;
@@ -353,8 +331,8 @@ export default {
       if (isEditing.value) return;
 
       setCurrentType('success');
-      setCurrentTitle(title || props.content?.title || 'Success');
-      setCurrentMessage(message || props.content?.message || '');
+      setCurrentTitle(title || (props.content && props.content.title) || 'Success');
+      setCurrentMessage(message || (props.content && props.content.message) || '');
 
       setIsVisible(true);
       isPaused.value = false;
@@ -374,8 +352,8 @@ export default {
       if (isEditing.value) return;
 
       setCurrentType('warning');
-      setCurrentTitle(title || props.content?.title || 'Warning');
-      setCurrentMessage(message || props.content?.message || '');
+      setCurrentTitle(title || (props.content && props.content.title) || 'Warning');
+      setCurrentMessage(message || (props.content && props.content.message) || '');
 
       setIsVisible(true);
       isPaused.value = false;
@@ -395,8 +373,8 @@ export default {
       if (isEditing.value) return;
 
       setCurrentType('error');
-      setCurrentTitle(title || props.content?.title || 'Error');
-      setCurrentMessage(message || props.content?.message || '');
+      setCurrentTitle(title || (props.content && props.content.title) || 'Error');
+      setCurrentMessage(message || (props.content && props.content.message) || '');
 
       setIsVisible(true);
       isPaused.value = false;
@@ -435,25 +413,21 @@ export default {
       }
     };
 
-    const onAfterLeave = () => {
-      progress.value = 100;
-    };
-
     // === WATCHERS ===
     // Watch for content changes to update current values when not visible
-    watch(() => props.content?.toastType, (newType) => {
+    watch(() => props.content && props.content.toastType, (newType) => {
       if (!isVisible.value && newType) {
         setCurrentType(newType);
       }
     });
 
-    watch(() => props.content?.title, (newTitle) => {
+    watch(() => props.content && props.content.title, (newTitle) => {
       if (!isVisible.value && newTitle) {
         setCurrentTitle(newTitle);
       }
     });
 
-    watch(() => props.content?.message, (newMessage) => {
+    watch(() => props.content && props.content.message, (newMessage) => {
       if (!isVisible.value && newMessage) {
         setCurrentMessage(newMessage);
       }
@@ -488,7 +462,6 @@ export default {
       typeColor,
       positionClass,
       animationClass,
-      transitionName,
       animationDurationMs,
 
       // Styles
@@ -507,7 +480,6 @@ export default {
       handleClose,
       handleMouseEnter,
       handleMouseLeave,
-      onAfterLeave,
 
       // Actions (exposed for workflows)
       showToast,
@@ -521,18 +493,47 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.ww-toast-wrapper {
+  width: 0;
+  height: 0;
+  overflow: visible;
+}
+
 .toast-container {
   position: fixed;
   z-index: 9999;
-  pointer-events: none;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity var(--animation-duration, 300ms) ease;
 
-  &.position-top-left,
-  &.position-top-center,
-  &.position-top-right,
-  &.position-bottom-left,
-  &.position-bottom-center,
-  &.position-bottom-right {
-    pointer-events: auto;
+  &.is-visible {
+    opacity: 1;
+  }
+
+  // Animation classes
+  &.animation-slide-fade.is-visible,
+  &.animation-slide.is-visible {
+    &.position-top-right,
+    &.position-bottom-right {
+      animation: slideInRight var(--animation-duration, 300ms) ease forwards;
+    }
+
+    &.position-top-left,
+    &.position-bottom-left {
+      animation: slideInLeft var(--animation-duration, 300ms) ease forwards;
+    }
+
+    &.position-top-center {
+      animation: slideInTop var(--animation-duration, 300ms) ease forwards;
+    }
+
+    &.position-bottom-center {
+      animation: slideInBottom var(--animation-duration, 300ms) ease forwards;
+    }
+  }
+
+  &.animation-fade.is-visible {
+    animation: fadeIn var(--animation-duration, 300ms) ease forwards;
   }
 }
 
@@ -603,94 +604,53 @@ export default {
   transform-origin: left;
 }
 
-// === TRANSITIONS ===
-
-// Fade transition
-.toast-fade-enter-active,
-.toast-fade-leave-active {
-  transition: opacity var(--animation-duration, 300ms) ease;
+// === ANIMATIONS ===
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.toast-fade-enter-from,
-.toast-fade-leave-to {
-  opacity: 0;
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-// Slide right transition
-.toast-slide-right-enter-active,
-.toast-slide-right-leave-active {
-  transition: all var(--animation-duration, 300ms) ease;
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.toast-slide-right-enter-from {
-  opacity: 0;
-  transform: translateX(100%);
-}
-
-.toast-slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(100%);
-}
-
-// Slide left transition
-.toast-slide-left-enter-active,
-.toast-slide-left-leave-active {
-  transition: all var(--animation-duration, 300ms) ease;
-}
-
-.toast-slide-left-enter-from {
-  opacity: 0;
-  transform: translateX(-100%);
-}
-
-.toast-slide-left-leave-to {
-  opacity: 0;
-  transform: translateX(-100%);
-}
-
-// Slide top transition
-.toast-slide-top-enter-active,
-.toast-slide-top-leave-active {
-  transition: all var(--animation-duration, 300ms) ease;
-}
-
-.toast-slide-top-enter-from {
-  opacity: 0;
-  transform: translateY(-100%);
-}
-
-.toast-slide-top-leave-to {
-  opacity: 0;
-  transform: translateY(-100%);
-}
-
-// Slide bottom transition
-.toast-slide-bottom-enter-active,
-.toast-slide-bottom-leave-active {
-  transition: all var(--animation-duration, 300ms) ease;
-}
-
-.toast-slide-bottom-enter-from {
-  opacity: 0;
-  transform: translateY(100%);
-}
-
-.toast-slide-bottom-leave-to {
-  opacity: 0;
-  transform: translateY(100%);
-}
-
-// Fix for center position transitions
-.position-top-center,
-.position-bottom-center {
-  &.toast-slide-top-enter-from,
-  &.toast-slide-top-leave-to {
+@keyframes slideInTop {
+  from {
+    opacity: 0;
     transform: translateX(-50%) translateY(-100%);
   }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
 
-  &.toast-slide-bottom-enter-from,
-  &.toast-slide-bottom-leave-to {
+@keyframes slideInBottom {
+  from {
+    opacity: 0;
     transform: translateX(-50%) translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 }
 
