@@ -489,14 +489,17 @@ export default {
   width: 0;
   height: 0;
   overflow: visible;
+  position: relative;
+  z-index: 999999 !important;
 }
 
 .toast-container {
   position: fixed;
-  z-index: 999999;
+  z-index: 999999 !important;
   pointer-events: auto;
   opacity: 0;
   transition: opacity var(--animation-duration, 300ms) ease;
+  isolation: isolate;
 
   &.is-visible {
     opacity: 1;
