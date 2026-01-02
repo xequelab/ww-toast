@@ -1,9 +1,9 @@
 <template>
-  <div class="ww-toast-wrapper" :class="{ 'mode-absolute': displayMode === 'absolute' }">
+  <div class="ww-toast-wrapper">
     <div
       v-if="isVisible || isEditing"
       class="toast-container"
-      :class="[positionClass, animationClass, { 'is-visible': isVisible, 'mode-absolute': displayMode === 'absolute' }]"
+      :class="[positionClass, animationClass, { 'is-visible': isVisible }]"
       :style="containerStyle"
       @mouseenter="handleMouseEnter"
       @mouseleave="handleMouseLeave"
@@ -140,7 +140,6 @@ export default {
     const position = computed(() => (props.content && props.content.position) || 'top-right');
     const animationType = computed(() => (props.content && props.content.animationType) || 'slide-fade');
     const animationDurationMs = computed(() => (props.content && props.content.animationDuration) || 300);
-    const displayMode = computed(() => (props.content && props.content.displayMode) || 'fixed');
 
     const typeColor = computed(() => {
       const type = currentType.value || (props.content && props.content.toastType) || 'success';
@@ -456,7 +455,6 @@ export default {
       positionClass,
       animationClass,
       animationDurationMs,
-      displayMode,
 
       // Styles
       containerStyle,
@@ -496,15 +494,6 @@ export default {
   left: 0 !important;
   z-index: 2147483647 !important;
   pointer-events: none;
-
-  &.mode-absolute {
-    position: relative !important;
-    width: 100%;
-    height: 100%;
-    top: auto !important;
-    left: auto !important;
-    z-index: 1 !important;
-  }
 }
 
 .toast-container {
@@ -513,11 +502,6 @@ export default {
   pointer-events: auto;
   opacity: 0;
   transition: opacity var(--animation-duration, 300ms) ease;
-
-  &.mode-absolute {
-    position: absolute !important;
-    z-index: 9999 !important;
-  }
 
   &.is-visible {
     opacity: 1;

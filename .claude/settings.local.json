@@ -4,12 +4,7 @@
       "Bash(dir /s /b \"c:\\\\Users\\\\home-e20\\\\Documents\\\\GitHub\\\\Claude Code doc WEWEB Component\")",
       "Bash(mkdir:*)",
       "Bash(git init:*)",
-      "Bash(git add:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial commit: Toast notification component for WeWeb\n\n- Support for success, warning, and error toast types\n- Configurable position \\(6 positions\\)\n- Configurable animations \\(slide+fade, fade, slide, none\\)\n- Progress bar showing remaining time\n- Pause on hover functionality\n- Close button\n- Exposed variables for workflow integration\n- Actions: showToast, hideToast, showSuccess, showWarning, showError\n- Fully responsive design\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(git remote add:*)",
-      "Bash(git branch:*)",
-      "Bash(git push:*)",
-      "Bash(git commit:*)"
+      "Bash(git add:*)"
     ]
   }
 }
