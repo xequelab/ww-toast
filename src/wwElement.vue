@@ -433,14 +433,6 @@ export default {
       }
     });
 
-    // Show toast in editor for preview
-    watch(isEditing, (editing) => {
-      if (editing) {
-        setIsVisible(true);
-        progress.value = 70; // Show partial progress for preview
-      }
-    }, { immediate: true });
-
     // === CLEANUP ===
     onBeforeUnmount(() => {
       clearTimers();
