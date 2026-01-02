@@ -168,7 +168,7 @@ export default {
       const style = {
         '--animation-duration': `${animationDurationMs.value}ms`,
         '--toast-width': (props.content && props.content.toastWidth) || '360px',
-        zIndex: 9999
+        zIndex: 999999
       };
 
       // Position styles
@@ -493,7 +493,7 @@ export default {
 
 .toast-container {
   position: fixed;
-  z-index: 9999;
+  z-index: 999999;
   pointer-events: auto;
   opacity: 0;
   transition: opacity var(--animation-duration, 300ms) ease;
