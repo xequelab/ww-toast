@@ -113,6 +113,23 @@ export default {
       }
       /* wwEditor:end */
     },
+    displayMode: {
+      label: { en: 'Display Mode' },
+      type: 'TextSelect',
+      section: 'settings',
+      defaultValue: 'fixed',
+      options: {
+        options: [
+          { value: 'fixed', label: 'Fixed (Full Screen)' },
+          { value: 'absolute', label: 'Absolute (Inside Parent)' }
+        ]
+      },
+      /* wwEditor:start */
+      propertyHelp: {
+        tooltip: 'Fixed: toast appears on screen regardless of scroll. Absolute: toast appears inside parent container (useful for popups)'
+      }
+      /* wwEditor:end */
+    },
     title: {
       label: { en: 'Title' },
       type: 'Text',
