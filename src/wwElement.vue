@@ -168,7 +168,7 @@ export default {
       const style = {
         '--animation-duration': `${animationDurationMs.value}ms`,
         '--toast-width': (props.content && props.content.toastWidth) || '360px',
-        zIndex: 999999
+        zIndex: 2147483647
       };
 
       // Position styles
@@ -484,22 +484,24 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .ww-toast-wrapper {
   width: 0;
   height: 0;
   overflow: visible;
-  position: relative;
-  z-index: 999999 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 2147483647 !important;
+  pointer-events: none;
 }
 
 .toast-container {
-  position: fixed;
-  z-index: 999999 !important;
+  position: fixed !important;
+  z-index: 2147483647 !important;
   pointer-events: auto;
   opacity: 0;
   transition: opacity var(--animation-duration, 300ms) ease;
-  isolation: isolate;
 
   &.is-visible {
     opacity: 1;
