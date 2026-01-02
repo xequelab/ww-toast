@@ -1,0 +1,10 @@
+{
+  "name": "ww-toast",
+  "version": "1.0.0",
+  "description": "Toast notification component for WeWeb with success, warning, and error types",
+  "scripts": {
+    "build": "weweb build",
+    "serve": "weweb serve"
+  },
+  "devDependencies": {}
+}
